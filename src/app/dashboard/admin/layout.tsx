@@ -18,7 +18,7 @@ const AdminDashboardLayout = async (props: Props) => {
     <div className="w-full h-full">
       {/* Sidebar */}
       <DashboardSidebar isAdmin={true} />
-      <div className="w-full ml-[300px]">
+      <div className="ml-[300px]">
         {/* Header */}
         <AdminDashboardHeader />
         <div className="w-full mt-[75px] p-4">{props.children}</div>
