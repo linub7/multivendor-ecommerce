@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Category } from '@prisma/client';
+import { v4 } from 'uuid';
 
 import { CategorySchema } from '@/lib/form-validations';
 import { AlertDialog } from '@/components/ui/alert-dialog';
@@ -28,6 +30,8 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import ImageUploader from '@/components/shared/image-uploader';
+import { upsertCategory } from '@/queries/category';
+import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   data?: Category;
@@ -36,6 +40,9 @@ interface Props {
 
 const AdminDashboardCategoryDetailsForm = (props: Props) => {
   const { data, cloudinaryKey } = props;
+
+  const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof CategorySchema>>({
     mode: 'onChange',
@@ -63,11 +70,35 @@ const AdminDashboardCategoryDetailsForm = (props: Props) => {
   const isLoading = form.formState.isSubmitting;
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof CategorySchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof CategorySchema>) => {
+    try {
+      const response = await upsertCategory({
+        id: data?.id ? data?.id : v4(),
+        name: values.name,
+        image: values.image[0].url,
+        url: values.url,
+        featured: values.featured,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      toast({
+        title: data?.id
+          ? 'Category has been updated.'
+          : `Congratulations! ${response?.name} is now created.`,
+      });
+
+      if (data?.id) router.refresh();
+      else router.push(`/dashboard/admin/categories`);
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: 'destructive',
+        title: 'OOPS!',
+        description: error?.toString() || 'Something went wrong.',
+      });
+    }
+  };
   return (
     <AlertDialog>
       <Card className="w-full">
@@ -91,7 +122,7 @@ const AdminDashboardCategoryDetailsForm = (props: Props) => {
                       <ImageUploader
                         type="profile"
                         values={field.value.map((img) => img.url)}
-                        disabled={isLoading}
+                        // disabled={isLoading}
                         cloudinaryKey={cloudinaryKey}
                         onChange={(url) => field.onChange([{ url }])}
                         onRemove={(url) =>
@@ -106,7 +137,7 @@ const AdminDashboardCategoryDetailsForm = (props: Props) => {
                 )}
               />
               <FormField
-                disabled={isLoading}
+                // disabled={isLoading}
                 control={form.control}
                 name="name"
                 render={({ field }) => (
@@ -120,7 +151,7 @@ const AdminDashboardCategoryDetailsForm = (props: Props) => {
                 )}
               />
               <FormField
-                disabled={isLoading}
+                // disabled={isLoading}
                 control={form.control}
                 name="url"
                 render={({ field }) => (

@@ -27,8 +27,6 @@ const ImageUploader = (props: Props) => {
     onRemove,
   } = props;
 
-  console.log(values);
-
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
