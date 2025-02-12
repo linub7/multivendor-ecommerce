@@ -35,11 +35,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   data?: Category;
-  cloudinaryKey: string;
 }
 
 const AdminDashboardCategoryDetailsForm = (props: Props) => {
-  const { data, cloudinaryKey } = props;
+  const { data } = props;
 
   const { toast } = useToast();
   const router = useRouter();
@@ -123,7 +122,6 @@ const AdminDashboardCategoryDetailsForm = (props: Props) => {
                         type="profile"
                         values={field.value.map((img) => img.url)}
                         // disabled={isLoading}
-                        cloudinaryKey={cloudinaryKey}
                         onChange={(url) => field.onChange([{ url }])}
                         onRemove={(url) =>
                           field.onChange(

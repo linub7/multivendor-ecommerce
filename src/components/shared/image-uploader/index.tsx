@@ -11,21 +11,14 @@ interface Props {
   values: string[];
   type: 'standard' | 'profile' | 'cover';
   isPreviewShown?: boolean;
-  cloudinaryKey: string;
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
 }
 
 const ImageUploader = (props: Props) => {
-  const {
-    type,
-    values,
-    disabled,
-    isPreviewShown,
-    cloudinaryKey,
-    onChange,
-    onRemove,
-  } = props;
+  const { type, values, disabled, isPreviewShown, onChange, onRemove } = props;
+
+  const CLOUDINARY_CLOUD_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME!;
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -57,7 +50,10 @@ const ImageUploader = (props: Props) => {
             className="w-52 h-52 rounded-full object-cover absolute top-0 left-0 bottom-0 right-0"
           />
         )}
-        <CldUploadWidget onSuccess={handleUpload} uploadPreset={cloudinaryKey}>
+        <CldUploadWidget
+          onSuccess={handleUpload}
+          uploadPreset={CLOUDINARY_CLOUD_KEY}
+        >
           {({ open }) => {
             const onClick = () => {
               open();
@@ -67,7 +63,7 @@ const ImageUploader = (props: Props) => {
               <>
                 <button
                   type="button"
-                  className="z-20 absolute right-0 bottom-6 flex items-center font-medium text-[17px] h-14 w-14 justify-center  text-white bg-gradient-to-t from-blue-primary to-blue-300 border-none shadow-lg rounded-full hover:shadow-md active:shadow-sm"
+                  className="absolute right-0 bottom-6 flex items-center font-medium text-[17px] h-14 w-14 justify-center  text-white bg-gradient-to-t from-blue-primary to-blue-300 border-none shadow-lg rounded-full hover:shadow-md active:shadow-sm"
                   disabled={disabled}
                   onClick={onClick}
                 >

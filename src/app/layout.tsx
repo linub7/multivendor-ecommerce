@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 
 import './globals.css';
+import ModalProvider from '@/providers/modal';
 
 const interFont = Inter({ subsets: ['latin'] });
 const barlowFont = Barlow({
@@ -35,7 +36,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <ModalProvider>{children}</ModalProvider>
             <Toaster />
             <SonnerToaster position="bottom-left" />
           </ThemeProvider>
