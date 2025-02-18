@@ -1,16 +1,23 @@
 import { currentUser } from '@clerk/nextjs/server';
+import { Store } from '@prisma/client';
 
 import Logo from '../logo';
 import DashboardUserInfo from './user-info';
 import AdminDashboardNav from '@/components/admin/dashboard/nav';
-import { adminDashboardSidebarOptions } from '@/constants/data';
+import {
+  adminDashboardSidebarOptions,
+  sellerDashboardSidebarOptions,
+} from '@/constants/data';
+import SellerDashboardNav from '@/components/seller/dashboard/nav';
 
 interface Props {
   isAdmin?: boolean;
+  isSeller?: boolean;
+  stores?: Store[];
 }
 
 const DashboardSidebar = async (props: Props) => {
-  const { isAdmin } = props;
+  const { isAdmin, isSeller, stores } = props;
 
   const user = await currentUser();
   return (
@@ -20,6 +27,9 @@ const DashboardSidebar = async (props: Props) => {
       {user && <DashboardUserInfo user={user} />}
       {isAdmin && (
         <AdminDashboardNav menuLinks={adminDashboardSidebarOptions} />
+      )}
+      {isSeller && (
+        <SellerDashboardNav menuLinks={sellerDashboardSidebarOptions} />
       )}
     </div>
   );

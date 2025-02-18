@@ -20,12 +20,21 @@ enum Role {
   SELLER
 }
 
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  BANNED
+  DISABLED
+}
+
 model User {
   id      String @id @default(uuid())
   name    String
   email   String @unique
   picture String @db.Text
   role    Role   @default(USER)
+
+  stores Store[] @relation("UserStores")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,4 +67,31 @@ model SubCategory {
   updatedAt DateTime @updatedAt
 
   @@index([categoryId])
+}
+
+model Store {
+  id                     String      @id @default(uuid())
+  name                   String
+  description            String      @db.Text
+  email                  String      @unique
+  phone                  String
+  url                    String      @unique
+  logo                   String
+  cover                  String
+  status                 StoreStatus @default(PENDING)
+  averageRating          Float       @default(0)
+  featured               Boolean     @default(false)
+  returnPolicy           String?
+  defaultShippingService String?
+  defaultShippingFees    Float?
+  defaultDeliveryTimeMin Int?
+  defaultDeliveryTimeMax Int?
+
+  userId String
+  user   User   @relation("UserStores", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([userId])
 }
