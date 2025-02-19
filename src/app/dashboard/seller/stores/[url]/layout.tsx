@@ -15,11 +15,11 @@ const SellerDashboardStoreLayout = async (props: Props) => {
   if (!user || user?.privateMetadata?.role !== 'SELLER') return redirect('/');
 
   const stores = await getSellerAllStores();
-  //   if (stores.length === 0) return redirect('/dashboard/seller/stores/new');
+  if (stores.length === 0) return redirect('/dashboard/seller/stores/new');
 
   return (
     <div className="w-full h-full">
-      <DashboardSidebar isSeller={true} />
+      <DashboardSidebar isSeller={true} stores={stores} />
       <div className="ml-[300px]">
         <AdminDashboardHeader />
         <div className="w-full mt-[75px] p-4">{props.children}</div>

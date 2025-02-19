@@ -8,7 +8,7 @@ const SellerDashboardPage = async () => {
   if (!user) return redirect('/');
 
   const stores = await getSellerAllStores();
-  // if (stores.length === 0) return redirect('/dashboard/seller/stores/new');
+  if (stores.length === 0) return redirect('/dashboard/seller/stores/new');
 
   redirect(`/dashboard/seller/stores/${stores[0].url}`);
 };

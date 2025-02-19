@@ -9,6 +9,7 @@ import {
   sellerDashboardSidebarOptions,
 } from '@/constants/data';
 import SellerDashboardNav from '@/components/seller/dashboard/nav';
+import StoreSwitcher from './store-switcher';
 
 interface Props {
   isAdmin?: boolean;
@@ -24,6 +25,7 @@ const DashboardSidebar = async (props: Props) => {
     <div className="w-[300px] border-r h-screen p-4 flex flex-col fixed top-0 left-0 bottom-0">
       <Logo width="100%" height="180px" />
       <span className="mt-3" />
+      {isSeller && stores && <StoreSwitcher stores={stores} />}
       {user && <DashboardUserInfo user={user} />}
       {isAdmin && (
         <AdminDashboardNav menuLinks={adminDashboardSidebarOptions} />

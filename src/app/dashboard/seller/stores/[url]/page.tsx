@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+
 import { getStoreByUrl } from '@/queries/store';
 
 interface Props {
@@ -8,7 +10,8 @@ const SellerDashboardStorePage = async (props: Props) => {
   const { params } = props;
   const { url } = await params;
 
-  // const store = await getStoreByUrl(url);
+  const store = await getStoreByUrl(url);
+  if (!store) redirect(`/dashboard/seller`);
 
   return <div></div>;
 };
