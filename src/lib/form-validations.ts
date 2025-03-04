@@ -254,7 +254,10 @@ export const ProductSchema = z.object({
     .min(1, 'Please provide at least one size.')
     .refine(
       (sizes) =>
-        sizes.every((s) => s.size.length > 0 && s.price > 0 && s.quantity > 0),
+        sizes.every(
+          (s) =>
+            s.size.length > 0 && s.size !== '' && s.price > 0 && s.quantity > 0
+        ),
       {
         message: 'All size inputs must be filled correctly.',
       }

@@ -35,6 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ProductWithVariant } from '@/lib/types';
 import ImagesPreviewGrid from '@/components/shared/images-preview-grid';
 import ClickToAddComponent from '@/components/shared/click-to-add';
+import ProductDetailsFormErrorMessageComponent from './error-message';
 
 interface Props {
   data?: ProductWithVariant;
@@ -52,6 +53,18 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
   const [tmpImages, setTmpImages] = useState<{ url: string }[]>([]);
   const [imgColors, setImgColors] = useState<{ color: string }[]>(
     data?.productVariantColors || [{ color: '' }]
+  );
+  const [productSizes, setProductSizes] = useState<
+    {
+      size: string;
+      quantity: number;
+      price: number;
+      discount: number;
+    }[]
+  >(
+    data?.productVariantSizes || [
+      { size: '', quantity: 1, price: 0.01, discount: 0 },
+    ]
   );
 
   const form = useForm<z.infer<typeof ProductSchema>>({
@@ -74,6 +87,9 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
     },
   });
 
+  // Extracted Form errors
+  const formErrors = form.formState.errors;
+
   // Reset form values when data changes
   useEffect(() => {
     if (data) {
@@ -94,6 +110,16 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
       });
     }
   }, [data, form]);
+
+  // Whenever colors, size, keywords changes, we have to update the form values
+  useEffect(() => {
+    form.setValue('productVariantColors', imgColors);
+    form.setValue('productVariantSizes', productSizes);
+
+    return () => {};
+  }, [form, imgColors, productSizes]);
+
+  console.log('form sizes', form.watch().productVariantSizes);
 
   const isLoading = form.formState.isSubmitting;
 
@@ -197,6 +223,11 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                     initialDetail={{ color: '' }}
                     setDetails={setImgColors}
                   />
+                  {formErrors.productVariantColors && (
+                    <ProductDetailsFormErrorMessageComponent
+                      errorMessage={formErrors.productVariantColors.message}
+                    />
+                  )}
                 </div>
               </div>
               {/* </div> */}
@@ -307,6 +338,25 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                   </FormItem>
                 )}
               />
+              {/* Colors */}
+              <div className="w-full flex flex-col gap-y-3 xl:pl-5">
+                <ClickToAddComponent
+                  details={productSizes}
+                  header="Sizes, Prices, Quantities, Discounts"
+                  initialDetail={{
+                    size: '',
+                    price: 0.01,
+                    quantity: 1,
+                    discount: 0,
+                  }}
+                  setDetails={setProductSizes}
+                />
+                {formErrors.productVariantSizes && (
+                  <ProductDetailsFormErrorMessageComponent
+                    errorMessage={formErrors.productVariantSizes.message}
+                  />
+                )}
+              </div>
               <Button type="submit" disabled={isLoading}>
                 {isLoading
                   ? 'loading...'
