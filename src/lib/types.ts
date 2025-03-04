@@ -12,3 +12,29 @@ export interface DashboardSidebarMenuInterface {
 export type SubCategoryWithCategory = Prisma.PromiseReturnType<
   typeof getAllSubCategories
 >[0];
+
+// Product + variant
+export type ProductWithVariant = {
+  productId: string;
+  variantId: string;
+  name: string;
+  description: string;
+  variantName: string;
+  variantDescription: string;
+  productVariantImages: { url: string }[];
+  categoryId: string;
+  subCategoryId: string;
+  isSale: boolean;
+  brand: string;
+  sku: string;
+  productVariantColors: { color: string }[];
+  productVariantSizes: {
+    size: string;
+    quantity: number;
+    price: number;
+    discount: number;
+  }[];
+  keywords: string[];
+  createdAt: Date;
+  updatedAt: Date;
+};
