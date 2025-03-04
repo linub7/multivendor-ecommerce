@@ -92,6 +92,26 @@ export const getAllSubCategories = async () => {
   }
 };
 
+// Function: getAllSubCategoriesOfCategory
+// Description: Get All Subcategories of a category
+// Permission level: PUBLIC
+// Parameter: categoryId
+export const getAllSubCategoriesOfCategory = async (categoryId: string) => {
+  try {
+    if (!categoryId) throw new Error('Please provide category id.');
+    const subCategories = await db.subCategory.findMany({
+      where: { categoryId },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+    return subCategories;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 // Function: getSubCategory
 // Description: Get One SubCategory by ID
 // Permission level: PUBLIC
