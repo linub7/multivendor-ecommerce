@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Category, SubCategory } from '@prisma/client';
 import { v4 } from 'uuid';
+import { WithOutContext as ReactTag } from 'react-tag-input';
 
 import { ProductSchema } from '@/lib/form-validations';
 import { AlertDialog } from '@/components/ui/alert-dialog';
@@ -32,7 +33,7 @@ import { Button } from '@/components/ui/button';
 import ImageUploader from '@/components/shared/image-uploader';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { ProductWithVariant } from '@/lib/types';
+import { ProductKeyword, ProductWithVariant } from '@/lib/types';
 import ImagesPreviewGrid from '@/components/shared/images-preview-grid';
 import ClickToAddComponent from '@/components/shared/click-to-add';
 import ProductDetailsFormErrorMessageComponent from './error-message';
@@ -75,6 +76,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
     ]
   );
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [keywords, setKeywords] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof ProductSchema>>({
     mode: 'onChange',
@@ -124,15 +126,33 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
   useEffect(() => {
     form.setValue('productVariantColors', imgColors);
     form.setValue('productVariantSizes', productSizes);
+    form.setValue('keywords', keywords);
 
     return () => {};
-  }, [form, imgColors, productSizes]);
+  }, [form, imgColors, productSizes, keywords]);
 
   // get subcategory when category selected by user
   useEffect(() => {
     if (form.watch().categoryId) handleGetSubCategories();
     return () => {};
   }, [form.watch().categoryId]);
+
+  // add keywords to product
+  const handleAddKeyword = (keyword: ProductKeyword) => {
+    if (keywords.length === 10)
+      return toast({
+        variant: 'destructive',
+        title: 'Keywords length Limitation',
+        description: 'Maximum keywords count is 10',
+      });
+    setKeywords([...keywords, keyword.text]);
+  };
+
+  // Delete keywords
+  const handleDeleteKeyword = (index: number) => {
+    const updatedKeywords = keywords.filter((_, idx) => idx !== index);
+    setKeywords(updatedKeywords);
+  };
 
   // get subcategory after selecting category
   const handleGetSubCategories = async () => {
@@ -251,6 +271,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                 </div>
               </div>
               {/* </div> */}
+
               {/* Name - Variant name */}
               <div className="flex flex-col gap-4 lg:flex-row">
                 <FormField
@@ -420,6 +441,47 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                     </FormItem>
                   )}
                 />
+              </div>
+
+              {/* Keywords */}
+              <div className="space-y-2">
+                <FormField
+                  // disabled={isLoading}
+                  control={form.control}
+                  name="keywords"
+                  render={({ field }) => (
+                    <FormItem className="relative flex-1">
+                      <FormLabel>Keywords</FormLabel>
+                      <FormControl>
+                        <ReactTag
+                          handleAddition={handleAddKeyword}
+                          placeholder="Keywords (e.g winter jacket, stylish)"
+                          classNames={{
+                            tagInputField:
+                              'bg-background border rounded-md p-2 w-full focus:outline-none',
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex flex-wrap gap-1">
+                  {keywords.map((item, index) => (
+                    <div
+                      key={index}
+                      className="text-xs inline-flex items-center px-3 py-1 bg-blue-200 text-blue-700 rounded-full gap-x-2"
+                    >
+                      <span>{item}</span>
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => handleDeleteKeyword(index)}
+                      >
+                        x
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Sizes */}

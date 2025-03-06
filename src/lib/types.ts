@@ -38,3 +38,9 @@ export type ProductWithVariant = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export interface ProductKeyword {
+  id: string;
+  className: string;
+  [key: string]: string;
+}
