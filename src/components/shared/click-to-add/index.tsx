@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { PaintBucket } from 'lucide-react';
+import { SketchPicker } from 'react-color';
 
 import PlusButton from '../buttons/plus';
 import { Input } from '@/components/ui/input';
@@ -26,8 +28,11 @@ const ClickToAddComponent = <T extends Detail>(props: Props<T>) => {
     details,
     header,
     initialDetail = {} as T, // Default value for initialDetail is an empty object
+    colorPicker,
     setDetails,
   } = props;
+
+  const [colorPickerIdx, setColorPickerIdx] = useState<number | null>(null);
 
   const handleAddDetail = () => {
     // Add a new detail object to the details array
@@ -40,7 +45,7 @@ const ClickToAddComponent = <T extends Detail>(props: Props<T>) => {
   };
 
   const handleRemoveDetail = (index: number) => {
-    // we must at least keep one detail we can not delete if it's the only detail avaiable
+    // we must at least keep one detail we can not delete if it's the only detail available
     if (details.length === 1) return;
     const updatedDetails = details.filter((_, idx) => idx !== index);
     setDetails(updatedDetails);
@@ -68,6 +73,32 @@ const ClickToAddComponent = <T extends Detail>(props: Props<T>) => {
         >
           {Object.keys(detail).map((property, propertyIndex) => (
             <div key={propertyIndex} className="flex items-center gap-x-4">
+              {/* Color picker toggle */}
+              {property === 'color' && colorPicker && (
+                <div className="flex gap-x-4">
+                  <button
+                    type="button"
+                    className="cursor-pointer"
+                    onClick={() =>
+                      setColorPickerIdx(colorPickerIdx === index ? null : index)
+                    }
+                  >
+                    <PaintBucket />
+                  </button>
+                  <span
+                    className="w-8 h-8 rounded-full"
+                    style={{ backgroundColor: detail[property] as string }}
+                  />
+                </div>
+              )}
+              {/* Color Picker */}
+              {colorPickerIdx === index && property === 'color' && (
+                <SketchPicker
+                  color={detail[property]}
+                  onChange={(e) => handleDetailsChange(index, property, e.hex)}
+                />
+              )}
+              {/* Input */}
               <Input
                 className="w-28"
                 type={typeof detail[property] === 'number' ? 'number' : 'text'}

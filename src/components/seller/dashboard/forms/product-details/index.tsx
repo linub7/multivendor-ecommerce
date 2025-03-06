@@ -261,6 +261,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                     details={imgColors}
                     header="Colors"
                     initialDetail={{ color: '' }}
+                    colorPicker={true}
                     setDetails={setImgColors}
                   />
                   {formErrors.productVariantColors && (
