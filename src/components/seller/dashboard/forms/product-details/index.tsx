@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { getAllSubCategoriesOfCategory } from '@/queries/sub-category';
+import { upsertProduct } from '@/queries/product';
 
 interface Props {
   data?: ProductWithVariant;
@@ -53,7 +54,7 @@ interface Props {
 }
 
 const SellerDashboardProductDetailsForm = (props: Props) => {
-  const { data, categories } = props;
+  const { data, categories, storeUrl } = props;
 
   const { toast } = useToast();
   const router = useRouter();
@@ -167,26 +168,36 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof ProductSchema>) => {
     try {
-      //   const response = await upsertStore({
-      //     id: data?.id ? data?.id : v4(),
-      //     name: values.name,
-      //     description: values.description,
-      //     email: values.email,
-      //     phone: values.phone,
-      //     logo: values.logo[0].url,
-      //     cover: values.cover[0].url,
-      //     url: values.url,
-      //     featured: values.featured,
-      //     createdAt: new Date(),
-      //     updatedAt: new Date(),
-      //   });
-      //   toast({
-      //     title: data?.id
-      //       ? 'store has been updated.'
-      //       : `Congratulations! ${response?.name} is now created.`,
-      //   });
-      //   if (data?.id) router.refresh();
-      //   else router.push(`/dashboard/seller/stores/${response.url}`);
+      const response = await upsertProduct(
+        {
+          productId: data?.productId ? data?.productId : v4(),
+          variantId: data?.variantId ? data?.variantId : v4(),
+          name: values.name,
+          description: values.description,
+          brand: values.brand,
+          isSale: values.isSale || false,
+          categoryId: values.categoryId,
+          subCategoryId: values.subCategoryId,
+          keywords: values.keywords || [],
+          sku: values.sku,
+          variantName: values.variantName,
+          variantDescription: values.variantDescription || '',
+          productVariantImages: values.productVariantImages,
+          productVariantColors: values.productVariantColors,
+          productVariantSizes: values.productVariantSizes || [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        storeUrl
+      );
+      toast({
+        title:
+          data?.productId && data?.variantId
+            ? 'Product has been updated.'
+            : `Congratulations! Product ${response?.slug} is now created.`,
+      });
+      if (data?.productId && data?.variantId) router.refresh();
+      else router.push(`/dashboard/seller/stores/${storeUrl}/products`);
     } catch (error) {
       console.log(error);
       toast({
@@ -450,6 +461,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                   // disabled={isLoading}
                   control={form.control}
                   name="keywords"
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   render={({ field }) => (
                     <FormItem className="relative flex-1">
                       <FormLabel>Keywords</FormLabel>
