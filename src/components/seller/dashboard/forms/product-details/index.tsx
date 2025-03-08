@@ -48,7 +48,7 @@ import { getAllSubCategoriesOfCategory } from '@/queries/sub-category';
 import { upsertProduct } from '@/queries/product';
 
 interface Props {
-  data?: ProductWithVariant;
+  data?: Partial<ProductWithVariant>;
   categories: Category[];
   storeUrl: string;
 }

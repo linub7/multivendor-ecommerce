@@ -145,51 +145,34 @@ export const upsertProduct = async (
       const newProduct = await db.product.create({ data: productPayload });
       return newProduct;
     }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
-    // const existedStore = await db.store.findFirst({
-    //   where: {
-    //     AND: [
-    //       {
-    //         OR: [
-    //           { name: store.name },
-    //           { url: store.url },
-    //           { email: store.email },
-    //           { phone: store.phone },
-    //         ],
-    //       },
-    //       {
-    //         NOT: { id: store.id },
-    //       },
-    //     ],
-    //   },
-    // });
-
-    // if (existedStore) {
-    //   let errorMessage = '';
-
-    //   if (existedStore.name === store.name)
-    //     errorMessage = 'Store name already exists';
-    //   else if (existedStore.url === store.url)
-    //     errorMessage = 'Store URL already exists';
-    //   else if (existedStore.email === store.email)
-    //     errorMessage = 'Store Email already exists';
-    //   else if (existedStore.phone === store.phone)
-    //     errorMessage = 'Store Phone already exists';
-    //   throw new Error(errorMessage);
-    // }
-
-    // const storeDetails = await db.store.upsert({
-    //   where: { id: store.id },
-    //   update: store,
-    //   create: {
-    //     ...store,
-    //     user: {
-    //       connect: { id: user.id },
-    //     },
-    //   },
-    // });
-
-    // return storeDetails;
+// Function: getSingleProductMainData
+// Description: get a single product main data
+// Permission required: PUBLIC
+// Parameter: product:
+//      - productId: ProductWithVariant object containing details of the product and its variant
+// Return: Product
+export const getSingleProductMainData = async (productId: string) => {
+  try {
+    if (!productId) throw new Error('Please provide a product id');
+    const existedProduct = await db.product.findUnique({
+      where: { id: productId },
+    });
+    if (!existedProduct) return null;
+    return {
+      productId: existedProduct.id,
+      name: existedProduct.name,
+      description: existedProduct.description,
+      brand: existedProduct.brand,
+      categoryId: existedProduct.categoryId,
+      subCategoryId: existedProduct.subCategoryId,
+      storeId: existedProduct.storeId,
+    };
   } catch (error) {
     console.log(error);
     throw error;
