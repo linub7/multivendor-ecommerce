@@ -1,8 +1,11 @@
 import { UserButton } from '@clerk/nextjs';
 
 import ThemeToggle from '@/components/shared/theme-toggle';
+// import { updateVariantImage } from '@/migration-scripts/variant-image';
 
-export default function Home() {
+export default async function Home() {
+  // in order to run updateVariantImage migration
+  // await updateVariantImage();
   return (
     <div className="p-5">
       <div className="w-100 flex gap-x-5 justify-end">
