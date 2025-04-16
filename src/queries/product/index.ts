@@ -101,6 +101,7 @@ export const upsertProduct = async (
           alt: img.url.split('/').pop() || '',
         })),
       },
+      variantImage: product.variantImage,
       productVariantColors: {
         create: product.productVariantColors.map((item) => ({
           name: item.color,

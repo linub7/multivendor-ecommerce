@@ -96,6 +96,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
       sku: data?.sku || '',
       variantDescription: data?.variantDescription || '',
       variantName: data?.variantName || '',
+      variantImage: data?.variantImage ? [{ url: data.variantImage }] : [],
     },
   });
 
@@ -119,6 +120,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
         productVariantSizes: data?.productVariantSizes,
         variantDescription: data?.variantDescription,
         variantName: data?.variantName,
+        variantImage: data.variantImage ? [{ url: data.variantImage }] : [],
       });
     }
   }, [data, form]);
@@ -183,6 +185,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
           variantName: values.variantName,
           variantDescription: values.variantDescription || '',
           productVariantImages: values.productVariantImages,
+          variantImage: values.variantImage[0].url,
           productVariantColors: values.productVariantColors,
           productVariantSizes: values.productVariantSizes || [],
           createdAt: new Date(),
@@ -229,7 +232,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                   control={form.control}
                   name="productVariantImages"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="w-full xl:border-r">
                       <FormControl>
                         <div>
                           <ImagesPreviewGrid
@@ -455,45 +458,74 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                 />
               </div>
 
-              {/* Keywords */}
-              <div className="space-y-2">
-                <FormField
-                  // disabled={isLoading}
-                  control={form.control}
-                  name="keywords"
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                  render={({ field }) => (
-                    <FormItem className="relative flex-1">
-                      <FormLabel>Keywords</FormLabel>
-                      <FormControl>
-                        <ReactTag
-                          handleAddition={handleAddKeyword}
-                          placeholder="Keywords (e.g winter jacket, stylish)"
-                          classNames={{
-                            tagInputField:
-                              'bg-background border rounded-md p-2 w-full focus:outline-none',
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex flex-wrap gap-1">
-                  {keywords.map((item, index) => (
-                    <div
-                      key={index}
-                      className="text-xs inline-flex items-center px-3 py-1 bg-blue-200 text-blue-700 rounded-full gap-x-2"
-                    >
-                      <span>{item}</span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => handleDeleteKeyword(index)}
+              {/* Variant Image - Keywords */}
+              <div className="flex items-center gap-10 py-14">
+                {/* Variant image */}
+                <div className="border-r pr-10">
+                  <FormField
+                    control={form.control}
+                    name="variantImage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="ml-14">Variant Image</FormLabel>
+                        <FormControl>
+                          <ImageUploader
+                            type="profile"
+                            values={field.value.map((img) => img.url)}
+                            // disabled={isLoading}
+                            onChange={(url) => field.onChange([{ url }])}
+                            onRemove={(url) =>
+                              field.onChange(
+                                ...field.value.filter((img) => img.url !== url)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage className="!mt-4" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                {/* Keywords */}
+                <div className="w-full flex-1 space-y-2">
+                  <FormField
+                    // disabled={isLoading}
+                    control={form.control}
+                    name="keywords"
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    render={({ field }) => (
+                      <FormItem className="relative flex-1">
+                        <FormLabel>Keywords</FormLabel>
+                        <FormControl>
+                          <ReactTag
+                            handleAddition={handleAddKeyword}
+                            placeholder="Keywords (e.g winter jacket, stylish)"
+                            classNames={{
+                              tagInputField:
+                                'bg-background border rounded-md p-2 w-full focus:outline-none',
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex flex-wrap gap-1">
+                    {keywords.map((item, index) => (
+                      <div
+                        key={index}
+                        className="text-xs inline-flex items-center px-3 py-1 bg-blue-200 text-blue-700 rounded-full gap-x-2"
                       >
-                        x
-                      </span>
-                    </div>
-                  ))}
+                        <span>{item}</span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => handleDeleteKeyword(index)}
+                        >
+                          x
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
