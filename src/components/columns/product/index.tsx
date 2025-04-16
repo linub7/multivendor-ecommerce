@@ -38,9 +38,6 @@ export const ProductColumns: ColumnDef<StoreProductType>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-col gap-y-3">
-          <h1 className="font-bold truncate pb-3 border-b capitalize">
-            {row.original.name}
-          </h1>
           <div className="relative flex flex-wrap gap-2">
             {row.original.variants.map((variant) => (
               <div key={variant.id} className="flex flex-col gap-y-2 group">
@@ -98,11 +95,13 @@ export const ProductColumns: ColumnDef<StoreProductType>[] = [
     },
   },
   {
-    accessorKey: 'brand',
-    header: 'Brand',
-    cell: ({ row }) => {
-      return <span>{row.original.brand}</span>;
-    },
+    accessorKey: 'name',
+    header: 'Name',
+    cell: ({ row }) => (
+      <h1 className="font-bold truncate pb-3 border-b capitalize">
+        {row.original.name}
+      </h1>
+    ),
   },
   {
     accessorKey: 'category',
