@@ -8,6 +8,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Category, SubCategory } from '@prisma/client';
 import { v4 } from 'uuid';
 import { WithOutContext as ReactTag } from 'react-tag-input';
+import { format } from 'date-fns';
+// React datetime picker
+import DateTimePicker from 'react-datetime-picker';
+import 'react-datetime-picker/dist/DateTimePicker.css';
+import 'react-calendar/dist/Calendar.css';
+import 'react-clock/dist/Clock.css';
 
 import { ProductSchema } from '@/lib/form-validations';
 import { AlertDialog } from '@/components/ui/alert-dialog';
@@ -90,6 +96,8 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
       categoryId: data?.categoryId || '',
       subCategoryId: data?.subCategoryId || '',
       isSale: data?.isSale || false,
+      saleEndDate:
+        data?.saleEndDate || format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
       keywords: data?.keywords || [],
       productVariantColors: data?.productVariantColors || [{ color: '' }],
       productVariantSizes: data?.productVariantSizes || [],
@@ -99,6 +107,8 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
       variantImage: data?.variantImage ? [{ url: data.variantImage }] : [],
     },
   });
+
+  const isSale = form.getValues().isSale;
 
   // Extracted Form errors
   const formErrors = form.formState.errors;
@@ -116,6 +126,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
         subCategoryId: data?.subCategoryId,
         keywords: data?.keywords || [],
         isSale: data?.isSale,
+        saleEndDate: data?.saleEndDate,
         productVariantColors: data?.productVariantColors,
         productVariantSizes: data?.productVariantSizes,
         variantDescription: data?.variantDescription,
@@ -178,6 +189,7 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
           description: values.description,
           brand: values.brand,
           isSale: values.isSale || false,
+          saleEndDate: values.saleEndDate,
           categoryId: values.categoryId,
           subCategoryId: values.subCategoryId,
           keywords: values.keywords || [],
@@ -549,27 +561,51 @@ const SellerDashboardProductDetailsForm = (props: Props) => {
                 )}
               </div>
 
-              {/* is on sale */}
-              <FormField
-                control={form.control}
-                name="isSale"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>On Sale</FormLabel>
-                      <FormDescription>
-                        Is this product on sale?
-                      </FormDescription>
-                    </div>
-                  </FormItem>
+              {/* is on sale - End Sale Date */}
+              <div className="flex flex-wrap items-center border rounded-md">
+                <FormField
+                  control={form.control}
+                  name="isSale"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-y-0 space-x-3 p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>On Sale</FormLabel>
+                        <FormDescription>
+                          Is this product on sale?
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                {isSale && (
+                  <FormField
+                    control={form.control}
+                    name="saleEndDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 p-4">
+                        <FormControl>
+                          <DateTimePicker
+                            onChange={(date) =>
+                              field.onChange(
+                                date
+                                  ? format(date, "yyyy-MM-dd'T'HH:mm:ss")
+                                  : ''
+                              )
+                            }
+                            value={field.value ? new Date(field.value) : null}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
+              </div>
 
               <Button type="submit" disabled={isLoading}>
                 {isLoading

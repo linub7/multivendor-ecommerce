@@ -136,6 +136,7 @@ model ProductVariant {
   variantDescription String  @db.Text
   slug               String  @unique
   isSale             Boolean @default(false)
+  saleEndDate        String?
   keywords           String
   sku                String // sku: specific number of product
 
