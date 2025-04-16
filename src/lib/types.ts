@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 
 import { getAllSubCategories } from '@/queries/sub-category';
+import { getProductsOfSingleStore } from '@/queries/product';
 
 export interface DashboardSidebarMenuInterface {
   label: string;
@@ -44,3 +45,7 @@ export interface ProductKeyword {
   className: string;
   [key: string]: string;
 }
+
+export type StoreProductType = Prisma.PromiseReturnType<
+  typeof getProductsOfSingleStore
+>[0];

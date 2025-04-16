@@ -10,7 +10,7 @@ import { generateUniqueSlug } from '@/lib/utils';
 // Function: upsertProduct
 // Description: upsert a product and its variant into the DB, ensure proper association with the store
 // Permission required: SELLER
-// Parameter: product:
+// Parameter:
 //      - product: ProductWithVariant object containing details of the product and its variant
 //      - storeUrl: The URL of the store to which the product belongs
 // Return: Newly created or updated product or product variant details
@@ -25,7 +25,7 @@ export const upsertProduct = async (
     // check if the user is authenticated
     if (!user) throw new Error('Unauthenticated');
 
-    // check if the user is an admin
+    // check if the user is an seller
     if (user.privateMetadata.role !== 'SELLER')
       throw new Error('Unauthorized. SELLER privileges required');
 
@@ -154,8 +154,8 @@ export const upsertProduct = async (
 // Function: getSingleProductMainData
 // Description: get a single product main data
 // Permission required: PUBLIC
-// Parameter: product:
-//      - productId: ProductWithVariant object containing details of the product and its variant
+// Parameter:
+//      - productId: product id
 // Return: Product
 export const getSingleProductMainData = async (productId: string) => {
   try {
@@ -173,6 +173,87 @@ export const getSingleProductMainData = async (productId: string) => {
       subCategoryId: existedProduct.subCategoryId,
       storeId: existedProduct.storeId,
     };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Function: getProductsOfSingleStore
+// Description: get products of one store
+// Permission required: PUBLIC
+// Parameter:
+//      - storeUrl: store url
+// Return: Products of specified store including  category, subCategory and variant details
+export const getProductsOfSingleStore = async (storeUrl: string) => {
+  try {
+    if (!storeUrl) throw new Error('Please provide a store id');
+
+    const existedStore = await db.store.findUnique({
+      where: {
+        url: storeUrl,
+      },
+    });
+    if (!existedStore) throw new Error('store not found');
+
+    const products = await db.product.findMany({
+      where: {
+        storeId: existedStore.id,
+      },
+      include: {
+        category: true,
+        subCategory: true,
+        variants: {
+          include: {
+            productVariantColors: true,
+            productVariantSizes: true,
+            productVariantImages: true,
+          },
+        },
+        store: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+    return products;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Function: deleteProduct
+// Description: delete product from DB
+// Permission required: SELLER only
+// Parameter:
+//      - productId: id of product
+// Return: Response indicating success or failure
+export const deleteProduct = async (productId: string) => {
+  try {
+    // get current user
+    const user = await currentUser();
+
+    // check if the user is authenticated
+    if (!user) throw new Error('Unauthenticated');
+
+    // check if the user is an seller
+    if (user.privateMetadata.role !== 'SELLER')
+      throw new Error('Unauthorized. SELLER privileges required');
+
+    if (!productId) throw new Error('Product ID data is required');
+
+    const deletedProduct = await db.product.delete({
+      where: {
+        id: productId,
+      },
+    });
+    return deletedProduct;
   } catch (error) {
     console.log(error);
     throw error;
